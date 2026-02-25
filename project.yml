@@ -1,0 +1,84 @@
+name: FileFairy
+options:
+  bundleIdPrefix: com.filefairy
+  deploymentTarget:
+    iOS: "17.0"
+  xcodeVersion: "16.0"
+  groupSortPosition: top
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.10"
+    IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+    DEVELOPMENT_TEAM: ""
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_STRICT_CONCURRENCY: complete
+    ENABLE_PREVIEWS: YES
+
+packages:
+  ZIPFoundation:
+    url: https://github.com/weichsel/ZIPFoundation
+    from: "0.9.19"
+
+targets:
+  FileFairy:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: FileFairy
+        excludes:
+          - "**/.DS_Store"
+    resources:
+      - path: FileFairy/Resources/Assets.xcassets
+      - path: FileFairy/Resources/Sounds
+    info:
+      path: FileFairy/Info.plist
+      properties:
+        CFBundleDisplayName: FileFairy
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        UILaunchScreen:
+          UIColorName: ""
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        NSPhotoLibraryUsageDescription: "FileFairy needs photo access to import images for conversion."
+        NSCameraUsageDescription: "FileFairy needs camera access to scan documents."
+        NSMicrophoneUsageDescription: "FileFairy may use the microphone during video scanning."
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: All Files
+            CFBundleTypeRole: Viewer
+            LSHandlerRank: Alternate
+            LSItemContentTypes:
+              - public.data
+              - public.content
+    entitlements:
+      path: FileFairy/FileFairy.entitlements
+      properties:
+        com.apple.security.app-sandbox: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.filefairy.app
+        INFOPLIST_FILE: FileFairy/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        CODE_SIGN_STYLE: Automatic
+    dependencies:
+      - sdk: SwiftData.framework
+      - sdk: StoreKit.framework
+      - sdk: AVFoundation.framework
+      - sdk: PDFKit.framework
+      - sdk: Vision.framework
+      - sdk: WebKit.framework
+      - sdk: VisionKit.framework
+      - sdk: UniformTypeIdentifiers.framework
+      - package: ZIPFoundation

@@ -162,6 +162,9 @@ struct ModuleFeatureCard: View {
                 .onChanged { _ in isPressed = true }
                 .onEnded   { _ in isPressed = false }
         )
+        .accessibilityLabel("\(title). \(subtitle)")
+        .accessibilityHint("Opens \(title)")
+        .accessibilityAddTraits(.isButton)
     }
 }
 
@@ -230,6 +233,9 @@ struct CompactModuleCard: View {
                 .onChanged { _ in isPressed = true }
                 .onEnded   { _ in isPressed = false }
         )
+        .accessibilityLabel(title)
+        .accessibilityHint("Opens \(title)")
+        .accessibilityAddTraits(.isButton)
     }
 }
 

@@ -229,34 +229,42 @@ private struct FairyQuickLookView: UIViewControllerRepresentable {
 private struct FairyImageViewer: View {
     let pageID: UUID
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+    @State private var image: UIImage? = nil
     @State private var scale: CGFloat = 1.0
     @State private var lastScale: CGFloat = 1.0
 
     var body: some View {
         NavigationStack {
-            GeometryReader { geo in
+            GeometryReader { _ in
                 ZStack {
                     Color.black.ignoresSafeArea()
 
-                    // Placeholder — in production, load the image from ScanSession
-                    Image(systemName: "photo.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: geo.size.width * 0.7)
-                        .foregroundStyle(Color.white.opacity(0.3))
-                        .scaleEffect(scale)
-                        .gesture(
-                            MagnificationGesture()
-                                .onChanged { value in
-                                    scale = max(1.0, min(5.0, lastScale * value))
-                                }
-                                .onEnded { _ in
-                                    lastScale = scale
-                                    if scale < 1.05 {
-                                        withAnimation(.fairySnappy) { scale = 1.0; lastScale = 1.0 }
+                    if let image {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .scaleEffect(scale)
+                            .gesture(
+                                MagnificationGesture()
+                                    .onChanged { value in
+                                        scale = max(1.0, min(5.0, lastScale * value))
                                     }
-                                }
-                        )
+                                    .onEnded { _ in
+                                        lastScale = scale
+                                        if scale < 1.05 {
+                                            withAnimation(.fairySnappy) { scale = 1.0; lastScale = 1.0 }
+                                        }
+                                    }
+                            )
+                            .accessibilityLabel("Scanned page")
+                            .accessibilityHint("Pinch to zoom")
+                    } else {
+                        ProgressView()
+                            .tint(.white)
+                            .accessibilityLabel("Loading image")
+                    }
                 }
             }
             .navigationTitle("Image")
@@ -269,6 +277,19 @@ private struct FairyImageViewer: View {
                         .foregroundStyle(.white)
                 }
             }
+        }
+        .task { loadImage() }
+    }
+
+    @MainActor
+    private func loadImage() {
+        var descriptor = FetchDescriptor<ScannedPage>(
+            predicate: #Predicate { $0.id == pageID }
+        )
+        descriptor.fetchLimit = 1
+        guard let page = try? modelContext.fetch(descriptor).first else { return }
+        if let data = page.imageData ?? page.thumbnailData {
+            image = UIImage(data: data)
         }
     }
 }

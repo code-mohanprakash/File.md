@@ -93,6 +93,8 @@ struct FairyBadge: View {
                             : AnyView(EmptyView())
                     )
             )
+            .accessibilityLabel(text)
+            .accessibilityAddTraits(.isStaticText)
     }
 }
 
@@ -137,6 +139,7 @@ struct FairyCountBadge: View {
                 .padding(.horizontal, isCircle ? 0 : 5)
                 .frame(minWidth: 18, minHeight: 18)
                 .background(color, in: Capsule())
+                .accessibilityLabel(count > maxCount ? "\(maxCount) or more" : "\(count)")
         }
     }
 }
@@ -187,6 +190,8 @@ struct FairyStatusBadge: View {
         .padding(.horizontal, Spacing.xs)
         .padding(.vertical, Spacing.xxxs + 1)
         .background(color.opacity(0.10), in: Capsule())
+        .accessibilityLabel("Status: \(text)")
+        .accessibilityAddTraits(.isStaticText)
         .onAppear {
             if animated { pulsing = true }
         }

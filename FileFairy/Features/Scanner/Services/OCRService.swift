@@ -10,6 +10,14 @@ import UIKit
 
 actor OCRService {
 
+    /// Recognition level: .accurate normally, .fast when device is thermally stressed.
+    private var recognitionLevel: VNRequestTextRecognitionLevel {
+        switch ProcessInfo.processInfo.thermalState {
+        case .serious, .critical: return .fast
+        default:                  return .accurate
+        }
+    }
+
     /// Recognize text in a UIImage
     func recognizeText(
         in image: UIImage,
@@ -42,8 +50,8 @@ actor OCRService {
                 continuation.resume(returning: text)
             }
 
-            // Configure for accurate recognition
-            request.recognitionLevel = .accurate
+            // Use accurate recognition; fall back to fast under thermal pressure
+            request.recognitionLevel = self.recognitionLevel
             request.usesLanguageCorrection = true
 
             // Set supported languages if specified
@@ -63,7 +71,7 @@ actor OCRService {
     /// Get list of supported languages
     func supportedLanguages() -> [String] {
         let request = VNRecognizeTextRequest()
-        request.recognitionLevel = .accurate
+        request.recognitionLevel = recognitionLevel
         return (try? request.supportedRecognitionLanguages()) ?? ["en-US"]
     }
 }

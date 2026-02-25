@@ -194,6 +194,8 @@ struct FairyButton: View {
         }
         .buttonStyle(resolvedButtonStyle)
         .disabled(isLoading)
+        .accessibilityLabel(isLoading ? "\(title), loading" : title)
+        .accessibilityAddTraits(isLoading ? .isStaticText : [])
     }
 
     // MARK: - Private
@@ -262,17 +264,20 @@ struct FairyIconButton: View {
     let systemName: String
     let color: Color
     let size: CGFloat
+    let label: String?
     let action: () -> Void
 
     init(
         systemName: String,
         color: Color = .Fairy.violet,
         size: CGFloat = 44,
+        label: String? = nil,
         action: @escaping () -> Void
     ) {
         self.systemName = systemName
         self.color = color
         self.size = size
+        self.label = label
         self.action = action
     }
 
@@ -287,9 +292,11 @@ struct FairyIconButton: View {
                 .foregroundStyle(color)
                 .frame(width: size, height: size)
                 .background(color.opacity(0.12), in: Circle())
+                .accessibilityHidden(true)
         }
         .pressScale(0.94)
         .buttonStyle(.plain)
+        .accessibilityLabel(label ?? systemName.replacingOccurrences(of: ".", with: " "))
     }
 }
 

@@ -86,6 +86,7 @@ private struct FairyTabItem: View {
                         .foregroundStyle(isSelected ? tab.activeColor : Color.secondary)
                         .symbolRenderingMode(.hierarchical)
                         .frame(width: 56, height: 32)
+                        .accessibilityHidden(true)
                 }
                 .animation(.spring(response: 0.35, dampingFraction: 0.7), value: isSelected)
 
@@ -99,6 +100,9 @@ private struct FairyTabItem: View {
         }
         .buttonStyle(FairyTabButtonStyle(isSelected: isSelected))
         .animation(.spring(response: 0.35, dampingFraction: 0.7), value: isSelected)
+        .accessibilityLabel(tab.title)
+        .accessibilityHint(isSelected ? "Currently selected" : "Tap to switch")
+        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
 }
 

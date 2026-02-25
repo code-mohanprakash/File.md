@@ -66,6 +66,7 @@ struct DuotoneIcon: View {
             foregroundIcon
         }
         .frame(width: size, height: size)
+        .accessibilityHidden(true)
     }
 
     // MARK: - Layers
@@ -161,6 +162,7 @@ struct ModuleIcon: View {
         }
         .frame(width: size, height: size)
         .fairyShadow(FairyShadow.moduleGlow(theme.primary))
+        .accessibilityHidden(true)
     }
 }
 
@@ -239,6 +241,7 @@ struct FileTypeIcon: View {
             shape: .roundedRect(radius: size * 0.28),
             backgroundOpacity: 0.14
         )
+        .accessibilityHidden(true)
     }
 }
 

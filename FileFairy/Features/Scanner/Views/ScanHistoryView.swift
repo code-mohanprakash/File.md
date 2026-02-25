@@ -6,6 +6,7 @@
 
 import SwiftUI
 import SwiftData
+import UIKit
 
 struct ScanHistoryView: View {
 
@@ -86,15 +87,25 @@ struct ScanSessionRow: View {
 
     var body: some View {
         HStack(spacing: Spacing.sm) {
-            // Thumbnail placeholder
+            // Thumbnail: first page's stored thumbnail or fallback icon
             ZStack {
                 RoundedRectangle(cornerRadius: CornerRadius.sm, style: .continuous)
                     .fill(Color.Fairy.blush)
                     .frame(width: 56, height: 56)
 
-                Image(systemName: "doc.text.fill")
-                    .font(.system(size: 22))
-                    .foregroundStyle(Color.Fairy.rose)
+                let firstPage = session.pages.min(by: { $0.pageIndex < $1.pageIndex })
+                if let data = firstPage?.thumbnailData ?? firstPage?.imageData,
+                   let uiImage = UIImage(data: data) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 56, height: 56)
+                        .clipShape(RoundedRectangle(cornerRadius: CornerRadius.sm, style: .continuous))
+                } else {
+                    Image(systemName: "doc.text.fill")
+                        .font(.system(size: 22))
+                        .foregroundStyle(Color.Fairy.rose)
+                }
             }
 
             VStack(alignment: .leading, spacing: Spacing.xxs) {
@@ -132,5 +143,7 @@ struct ScanSessionRow: View {
         }
         .padding(.vertical, Spacing.xs)
         .listRowBackground(Color.Fairy.dust)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(session.title), \(session.pageCount) page\(session.pageCount == 1 ? "" : "s"), \(session.exportFormat.uppercased()) format, \(session.createdAt.formatted(date: .abbreviated, time: .shortened))")
     }
 }

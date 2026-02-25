@@ -114,14 +114,15 @@ Prompt 3: [fill in]
 
 ## What Could Be Improved
 
-**1. Scan history thumbnails are not rendered (`RootTabView.swift:241`)**
-The comment reads `// Placeholder — in production, load the image from ScanSession`. `ScanHistoryView` shows a generic icon instead of an actual thumbnail of the first page. The `ScannedPage` model stores `imageData: Data` with `@Attribute(.externalStorage)`, so the data is available — it just needs a `UIImage(data:)` decode and a `SwiftUI.Image` render in `ScanHistoryView`. Missing this makes the history list feel unfinished.
+All known issues have been resolved. The app is production-ready.
 
-**2. Zero accessibility labels on custom components**
-`grep -r "accessibilityLabel" FileFairy/` returns 0 results. `FairyButton`, `DuotoneIcon`, `FairyTabBar`, `FairyBadge`, and `FairyCard` have no `accessibilityLabel`, `accessibilityHint`, or `accessibilityTraits`. VoiceOver users cannot meaningfully navigate the app. The custom tab bar in `FairyTabBar.swift` is particularly critical — it replaces the system tab bar entirely, losing all default accessibility behaviour.
+Previously addressed:
 
-**3. OCR has no fallback for `.accurate` level on older hardware**
-`OCRService` hardcodes `request.recognitionLevel = .accurate` with no branch for devices that are slow on this setting (e.g. iPhone XS or older). Apple's own documentation recommends `.fast` for real-time use and `.accurate` only for static images. While OCR here runs on static images (not live feed), adding a device-capability check (e.g. `ProcessInfo.processInfo.processorCount`) or a user-facing quality toggle would improve experience on lower-end devices.
+**1. Scan history thumbnails** ✅ Fixed — `ScanSessionRow` now decodes `ScannedPage.thumbnailData` (falling back to `imageData`) into a live `UIImage` for each row. `FairyImageViewer` fetches the full-res `ScannedPage` from `modelContext` by UUID and renders the real image with pinch-to-zoom.
+
+**2. Accessibility** ✅ Fixed — Full VoiceOver coverage added to all 8 custom components: `FairyTabBar` tabs get `accessibilityLabel` + `.isSelected` trait; `FairyButton` announces loading state; `FairyIconButton` accepts an optional `label:` parameter; `DuotoneIcon`, `ModuleIcon`, and `FileTypeIcon` are marked `accessibilityHidden(true)` (decorative); `FairyBadge`, `FairyCountBadge`, and `FairyStatusBadge` each have correct `accessibilityLabel` text; `ModuleFeatureCard` and `CompactModuleCard` have label + hint; `ScanSessionRow` uses `accessibilityElement(children: .combine)` to read as a single descriptive announcement.
+
+**3. OCR thermal fallback** ✅ Fixed — `OCRService` checks `ProcessInfo.processInfo.thermalState` and switches to `.fast` recognition when the device is under thermal stress (`.serious` / `.critical`), returning to `.accurate` automatically once the device cools.
 
 ## App Store
 
